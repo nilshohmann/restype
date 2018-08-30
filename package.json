@@ -1,0 +1,32 @@
+{
+  "name": "restype",
+  "version": "0.1.0",
+  "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/nilshohmann/restype"
+  },
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "lint": "tslint --project ."
+  },
+  "dependencies": {
+    "body-parser": "^1.18.3",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.16.3",
+    "on-finished": "^2.3.0",
+    "typedi": "^0.8.0"
+  },
+  "devDependencies": {
+    "@types/body-parser": "^1.17.0",
+    "@types/cookie-parser": "^1.4.1",
+    "@types/express": "^4.16.0",
+    "@types/node": "^9.6.30",
+    "@types/on-finished": "^2.3.1",
+    "reflect-metadata": "^0.1.12",
+    "tslint": "^5.11.0",
+    "typescript": "^2.9.2"
+  }
+}
