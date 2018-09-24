@@ -1,3 +1,4 @@
+import { AuthenticationType } from '../Authentication';
 import { logger } from '../Logging';
 import { registerRoute } from '../Register';
 
@@ -5,6 +6,7 @@ export declare type HttpMethod = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'D
 
 export interface RouteOptions {
   method?: HttpMethod;
+  authentication?: AuthenticationType;
   route?: string;
 }
 
@@ -44,32 +46,32 @@ export function Route(options?: RouteOptions) {
 
 }
 
-export function Get(route?: string) {
-  const options: RouteOptions = { method: 'GET', route };
+export function Get(route?: string, authentication?: AuthenticationType) {
+  const options: RouteOptions = { method: 'GET', authentication, route };
   return Route(options);
 }
 
-export function Head(route?: string) {
-  const options: RouteOptions = { method: 'HEAD', route };
+export function Head(route?: string, authentication?: AuthenticationType) {
+  const options: RouteOptions = { method: 'HEAD', authentication, route };
   return Route(options);
 }
 
-export function Post(route?: string) {
-  const options: RouteOptions = { method: 'POST', route };
+export function Post(route?: string, authentication?: AuthenticationType) {
+  const options: RouteOptions = { method: 'POST', authentication, route };
   return Route(options);
 }
 
-export function Put(route?: string) {
-  const options: RouteOptions = { method: 'PUT', route };
+export function Put(route?: string, authentication?: AuthenticationType) {
+  const options: RouteOptions = { method: 'PUT', authentication, route };
   return Route(options);
 }
 
-export function Patch(route?: string) {
-  const options: RouteOptions = { method: 'PATCH', route };
+export function Patch(route?: string, authentication?: AuthenticationType) {
+  const options: RouteOptions = { method: 'PATCH', authentication, route };
   return Route(options);
 }
 
-export function Delete(route?: string) {
-  const options: RouteOptions = { method: 'DELETE', route };
+export function Delete(route?: string, authentication?: AuthenticationType) {
+  const options: RouteOptions = { method: 'DELETE', authentication, route };
   return Route(options);
 }

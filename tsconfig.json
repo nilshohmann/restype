@@ -13,8 +13,5 @@
     "removeComments": true,
     "declaration": true,
     "outDir": "lib",
-  },
-  "include": [
-    "src/**/*"
-  ]
+  }
 }

@@ -3,14 +3,14 @@ import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
 import { Express, Request, Response, Router } from 'express';
 import { createServer, Server } from 'http';
-import { Container, ContainerInstance, ObjectType } from 'typedi';
+import * as path from 'path';
+import { Container, ContainerInstance } from 'typedi';
 
+import { Authenticator, globalAuthentication, RestAuthentication } from './Authentication';
 import { HttpConfig } from './HttpConfig';
 import { HttpError, InvalidParamsError } from './HttpError';
 import { logger, LoggerType } from './Logging';
 import { controllerFor, ControllerItem, paramsFor, registerForContainer, RouteItem, routesFor } from './Register';
-
-import * as path from 'path';
 
 /**
  * Basic web server setup.
@@ -20,6 +20,18 @@ export class Restype {
   private app: Express;
   private server: Server;
   private container: ContainerInstance;
+  private authenticator: Authenticator;
+
+  public static get auth(): RestAuthentication {
+    return globalAuthentication;
+  }
+
+  public static set auth(restAuthentication: RestAuthentication) {
+    restAuthentication = restAuthentication || {};
+    globalAuthentication.basicAuthentication = restAuthentication.basicAuthentication;
+    globalAuthentication.jwtAuthentication = restAuthentication.jwtAuthentication;
+    globalAuthentication.jwtSecret = restAuthentication.jwtSecret;
+  }
 
   public static useLogger(loggerToUse: LoggerType) {
     logger.setLogger(loggerToUse);
@@ -33,6 +45,7 @@ export class Restype {
     this.httpConfig.host = this.httpConfig.host || 'localhost';
     this.httpConfig.controllers = this.httpConfig.controllers || [];
     this.httpConfig.customRoutes = this.httpConfig.customRoutes || [];
+    this.authenticator = new Authenticator();
 
     this.app = express();
 
@@ -133,13 +146,16 @@ export class Restype {
     const router = Router();
 
     routes.forEach((routeItem) => {
-      const routeFunc = this.routeForMethod(controllerItem.controller, routeItem.property);
+      const authentication = routeItem.options.authentication || controllerItem.options.authentication;
+      const routeFunc = this.routeForMethod(controllerItem, routeItem);
       const route = controllerItem.options.route + routeItem.options.route;
 
       switch (routeItem.options.method) {
         case 'GET': router.get(route, routeFunc); break;
+        case 'HEAD': router.head(route, routeFunc); break;
         case 'POST': router.post(route, routeFunc); break;
         case 'PUT': router.put(route, routeFunc); break;
+        case 'PATCH': router.patch(route, routeFunc); break;
         case 'DELETE': router.delete(route, routeFunc); break;
         default: logger.warn(`Unknown method for route ${route}: ${routeItem.options.method}`);
       }
@@ -148,11 +164,17 @@ export class Restype {
     return router;
   }
 
-  private routeForMethod = (controller: ObjectType<any>, property: string): ((req: Request, res: Response) => void) => {
-    const params = paramsFor(controller, property);
+  private routeForMethod = (controllerItem: ControllerItem, routeItem: RouteItem): ((req: Request, res: Response) => void) => {
+    const params = paramsFor(controllerItem.controller, routeItem.property);
+
+    const authentication = routeItem.options.authentication || controllerItem.options.authentication;
 
     return async (req: Request, res: Response) => {
       try {
+        if (authentication && !await this.authenticator.authenticate(authentication, req)) {
+          res.status(401).json({ error: 'Unauthorized' });
+        }
+
         const args: any[] = [];
         params.forEach((param) => {
           args[param.options.index] = ((type: string) => {
@@ -174,8 +196,8 @@ export class Restype {
           })(param.options.type);
         });
 
-        const instance = this.container ? this.container.get(controller) : Container.get(controller);
-        const method: (...args: any[]) => Promise<any> = instance[property].bind(instance);
+        const instance = this.container ? this.container.get(controllerItem.controller) : Container.get(controllerItem.controller);
+        const method: (...args: any[]) => Promise<any> = instance[routeItem.property].bind(instance);
 
         const result = await method(...args);
         if (typeof result === 'object') {

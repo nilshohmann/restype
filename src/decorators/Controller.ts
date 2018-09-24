@@ -1,10 +1,12 @@
 import { ObjectType } from 'typedi';
 import { logger } from '../Logging';
 
+import { AuthenticationType } from '../Authentication';
 import { registerController } from '../Register';
 
 export interface ControllerOptions {
   route?: string;
+  authentication?: AuthenticationType;
   transient?: boolean;
   global?: boolean;
   id?: string;
