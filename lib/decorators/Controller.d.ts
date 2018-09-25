@@ -1,5 +1,5 @@
 import { ObjectType } from 'typedi';
-import { AuthenticationType } from '../Authentication';
+import { AuthenticationType } from '../authentication/RestAuthentication';
 export interface ControllerOptions {
     route?: string;
     authentication?: AuthenticationType;

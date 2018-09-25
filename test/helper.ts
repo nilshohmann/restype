@@ -1,7 +1,8 @@
+/**
+ * Object extensions.
+ */
 declare interface ObjectConstructor {
-
   extend<T>(base: T, extension: T): T;
-
 }
 
 Object.extend = (base: any, extension: any): any => {
@@ -15,10 +16,11 @@ Object.extend = (base: any, extension: any): any => {
   return copy;
 };
 
+/**
+ * Promise extension.
+ */
 declare interface PromiseConstructor {
-
   sleep(seconds: number): Promise<void>;
-
 }
 
 Promise.sleep = (seconds: number): Promise<void> => {

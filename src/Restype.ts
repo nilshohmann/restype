@@ -1,16 +1,22 @@
 import * as bodyParser from 'body-parser';
 import * as cookieParser from 'cookie-parser';
 import * as express from 'express';
-import { Express, Request, Response, Router } from 'express';
+import { Express, Request as ExpressRequest, Response, Router } from 'express';
 import { createServer, Server } from 'http';
 import * as path from 'path';
 import { Container, ContainerInstance } from 'typedi';
 
-import { Authenticator, globalAuthentication, RestAuthentication } from './Authentication';
+import { RestAuthentication } from './authentication/RestAuthentication';
 import { HttpConfig } from './HttpConfig';
 import { HttpError, InvalidParamsError } from './HttpError';
 import { logger, LoggerType } from './Logging';
 import { controllerFor, ControllerItem, paramsFor, registerForContainer, RouteItem, routesFor } from './Register';
+
+export interface Request extends ExpressRequest {
+
+  auth: RestAuthentication;
+
+}
 
 /**
  * Basic web server setup.
@@ -20,18 +26,7 @@ export class Restype {
   private app: Express;
   private server: Server;
   private container: ContainerInstance;
-  private authenticator: Authenticator;
-
-  public static get auth(): RestAuthentication {
-    return globalAuthentication;
-  }
-
-  public static set auth(restAuthentication: RestAuthentication) {
-    restAuthentication = restAuthentication || {};
-    globalAuthentication.basicAuthentication = restAuthentication.basicAuthentication;
-    globalAuthentication.jwtAuthentication = restAuthentication.jwtAuthentication;
-    globalAuthentication.jwtSecret = restAuthentication.jwtSecret;
-  }
+  private authentication: RestAuthentication;
 
   public static useLogger(loggerToUse: LoggerType) {
     logger.setLogger(loggerToUse);
@@ -45,21 +40,25 @@ export class Restype {
     this.httpConfig.host = this.httpConfig.host || 'localhost';
     this.httpConfig.controllers = this.httpConfig.controllers || [];
     this.httpConfig.customRoutes = this.httpConfig.customRoutes || [];
-    this.authenticator = new Authenticator();
+    this.httpConfig.accessControl = this.httpConfig.accessControl || {};
+    this.httpConfig.fileSizeLimit = this.httpConfig.fileSizeLimit || '5mb';
+    this.authentication = new RestAuthentication(this.httpConfig.auth);
 
     this.app = express();
 
     // Setup logger, body-parser and cookie-parser
     this.app.use(logger.httpLogger(httpConfig.logFormat, httpConfig.logLevel))
-      .use(bodyParser.json({ limit: '5mb' }))
-      .use(bodyParser.urlencoded({ extended: true, limit: '5mb' }))
+      .use(bodyParser.json({ limit: this.httpConfig.fileSizeLimit }))
+      .use(bodyParser.urlencoded({ extended: true, limit: this.httpConfig.fileSizeLimit }))
       .use(cookieParser())
       .enable('strict routing');
 
+    const allowedHeaders = (httpConfig.accessControl.allowHeaders || ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization']).join(',');
+    const allowedMethods = (httpConfig.accessControl.allowMethods || ['GET', 'HEAD', 'POST', 'PUT', 'PATCH', 'DELETE']).join(',');
     this.app.use((req, res, next) => {
-      res.header('Access-Control-Allow-Origin', '*');
-      res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
-      res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
+      res.header('Access-Control-Allow-Origin', this.httpConfig.accessControl.allowOrigin || '');
+      res.header('Access-Control-Allow-Headers', allowedHeaders); // ['Origin', 'X-Requested-With', 'Content-Type', 'Accept', 'Authorization'];
+      res.header('Access-Control-Allow-Methods', allowedMethods); // 'GET, HEAD, POST, PUT, PATCH, DELETE');
 
       next();
     });
@@ -146,7 +145,6 @@ export class Restype {
     const router = Router();
 
     routes.forEach((routeItem) => {
-      const authentication = routeItem.options.authentication || controllerItem.options.authentication;
       const routeFunc = this.routeForMethod(controllerItem, routeItem);
       const route = controllerItem.options.route + routeItem.options.route;
 
@@ -171,9 +169,16 @@ export class Restype {
 
     return async (req: Request, res: Response) => {
       try {
-        if (authentication && !await this.authenticator.authenticate(authentication, req)) {
-          res.status(401).json({ error: 'Unauthorized' });
+        let user: any = null;
+        if (authentication) {
+          user = await this.authentication.authenticate<any>(authentication, req);
+          if (!user) {
+            res.status(401).json({ error: 'Unauthorized' });
+          }
         }
+
+        req.auth = this.authentication;
+        req.params = req.params || {};
 
         const args: any[] = [];
         params.forEach((param) => {
@@ -181,6 +186,11 @@ export class Restype {
             switch (type) {
               case 'req': return req;
               case 'res': return res;
+              case 'user':
+              if (!param.options.optional && !user) {
+                throw new InvalidParamsError('Missing user');
+              }
+              return user;
               case 'body':
                 if (!param.options.optional && !req.body) {
                   throw new InvalidParamsError('Missing body');

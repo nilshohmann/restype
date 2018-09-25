@@ -21,6 +21,16 @@ export function Body(optional?: boolean): Function {
   };
 }
 
+export function User(optional?: boolean): Function {
+  optional = !!optional;
+
+  return (target: Object, property: string, index: number) => {
+    logger.debug(`User ${target.constructor.name}.${property}[${index}] - ${optional}`);
+
+    registerParam(target, property, { type: 'user', index, name: null, optional });
+  };
+}
+
 export function Req(): Function {
   return (target: Object, property: string, index: number) => {
     logger.debug(`Req ${target.constructor.name}.${property}[${index}]`);

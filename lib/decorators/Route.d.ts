@@ -1,4 +1,4 @@
-import { AuthenticationType } from '../Authentication';
+import { AuthenticationType } from '../authentication/RestAuthentication';
 export declare type HttpMethod = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export interface RouteOptions {
     method?: HttpMethod;

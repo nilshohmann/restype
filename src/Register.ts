@@ -3,7 +3,7 @@ import { Container, ContainerInstance, ObjectType, ServiceMetadata } from 'typed
 import { ControllerOptions } from './decorators/Controller';
 import { RouteOptions } from './decorators/Route';
 
-export interface ParamOptions { type: 'param' | 'body' | 'req' | 'res'; index: number; name: string; optional: boolean; }
+export interface ParamOptions { type: 'param' | 'body' | 'user' | 'req' | 'res'; index: number; name: string; optional: boolean; }
 
 export interface ControllerItem { controller: ObjectType<any>; options: ControllerOptions; }
 export interface RouteItem { controllerType: any; property: string; options: RouteOptions; }

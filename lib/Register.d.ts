@@ -2,7 +2,7 @@ import { ContainerInstance, ObjectType } from 'typedi';
 import { ControllerOptions } from './decorators/Controller';
 import { RouteOptions } from './decorators/Route';
 export interface ParamOptions {
-    type: 'param' | 'body' | 'req' | 'res';
+    type: 'param' | 'body' | 'user' | 'req' | 'res';
     index: number;
     name: string;
     optional: boolean;

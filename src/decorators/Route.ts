@@ -1,4 +1,4 @@
-import { AuthenticationType } from '../Authentication';
+import { AuthenticationType } from '../authentication/RestAuthentication';
 import { logger } from '../Logging';
 import { registerRoute } from '../Register';
 

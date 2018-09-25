@@ -13,6 +13,15 @@ import { Restype } from '../../src/Restype';
 before(() => {
     chai.should();
     chai.use(ChaiAsPromised);
+
+    Restype.useLogger({
+      verbose: () => {},
+      log: () => {},
+      info: () => {},
+      debug: () => {},
+      warn: () => {},
+      error: () => {},
+    });
 });
 
 const httpConfig: HttpConfig = {
@@ -28,14 +37,6 @@ describe('Controller', () => {
 
   beforeEach(() => {
     Container.reset();
-    Restype.useLogger({
-      verbose: () => {},
-      log: () => {},
-      info: () => {},
-      debug: () => {},
-      warn: () => {},
-      error: () => {},
-    });
   });
 
   describe('Registration', () => {
