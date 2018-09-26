@@ -180,7 +180,7 @@ export class Restype {
         if (authentication) {
           user = await this.authentication.authenticate<any>(authentication, req);
           if (!user) {
-            res.status(401).json({ error: 'Unauthorized' });
+            return res.status(401).json({ error: 'Unauthorized' });
           }
         }
 
