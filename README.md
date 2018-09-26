@@ -35,10 +35,11 @@ Defines a controller as a base for REST routes. The controllers also function as
 
 The options contain
 
-- an optional route path, the controller's class name (without trailing 'controller') is used if not provided - this does not work properly with webpack etc.)
-- a transient flag used for typedi
-- a global flag used for typedi
-- an id used for typedi
+- an optional **route** path, the controller's class name (without trailing 'controller') is used if not provided - this does not work properly with webpack etc.)
+- an **authentication** type (currently 'basic' or 'jwt')
+- a **transient** flag used for typedi
+- a **global** flag used for typedi
+- an **id** used for typedi
 
 ### Routes
 
@@ -46,17 +47,22 @@ The options contain
 
 Defines a route inside of a controller. A route consists of a http method and a path to access the route. Valid http methods are `GET`, `HEAD`, `POST`, `PUT`, `PATCH`, and `DELETE`. They all have convenience decorators ( e.g. `@Get(route?: string)` ) which only need an optional path parameter, defaulting to the decorated method's name if not provided. The route's path may also contain parameters in express style.
 
-The decorator expects a method returing a `Promise` as a return value. The asynchronous result of the method is then returned to the http request. If the result is of type `object` it is automacally converted to a JSON string before beeing delivered.
+The decorator expects a method returning a `Promise` as a return value. The asynchronous result of the method is then returned to the http request. If the result is of type `object` it is automacally converted to a JSON string before beeing delivered.
 
 ### Paramters
 
 A parameter decorator is used within the route methods to automatically inject parameters from the currrent http call. These include:
 
 - `@Param(name: string, optional?: boolean)`
-  - 
+  - Injects a query parameter with the given name
 - `@Body(optional?: boolean)`
+  - Injects the request body
+- `@User(optional?: boolean)`
+  - Injects the authenticated user if available
 - `@Req()`
+  - Injects the raw express request
 - `@Res()`
+  - Injects the raw express response
 
 ## Example
 

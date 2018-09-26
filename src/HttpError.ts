@@ -9,6 +9,22 @@ export class HttpError extends Error {
 
 }
 
+export class UnauthorizedError extends HttpError {
+
+  public constructor(message?: string) {
+    super(401, message || 'Unauthorized');
+  }
+
+}
+
+export class AccessDeniedError extends HttpError {
+
+  public constructor(message?: string) {
+    super(401, message || 'Access denied');
+  }
+
+}
+
 export class InvalidParamsError extends HttpError {
 
   public constructor(message?: string) {

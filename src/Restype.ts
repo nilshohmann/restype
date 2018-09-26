@@ -6,6 +6,7 @@ import { createServer, Server } from 'http';
 import * as path from 'path';
 import { Container, ContainerInstance } from 'typedi';
 
+import { ChallengeAuthentication } from './authentication/ChallengeAuthentication';
 import { RestAuthentication } from './authentication/RestAuthentication';
 import { HttpConfig } from './HttpConfig';
 import { HttpError, InvalidParamsError } from './HttpError';
@@ -15,6 +16,7 @@ import { controllerFor, ControllerItem, paramsFor, registerForContainer, RouteIt
 export interface Request extends ExpressRequest {
 
   auth: RestAuthentication;
+  challenge: ChallengeAuthentication;
 
 }
 
@@ -27,6 +29,7 @@ export class Restype {
   private server: Server;
   private container: ContainerInstance;
   private authentication: RestAuthentication;
+  private challengeAuthentication: ChallengeAuthentication;
 
   public static useLogger(loggerToUse: LoggerType) {
     logger.setLogger(loggerToUse);
@@ -42,9 +45,13 @@ export class Restype {
     this.httpConfig.customRoutes = this.httpConfig.customRoutes || [];
     this.httpConfig.accessControl = this.httpConfig.accessControl || {};
     this.httpConfig.fileSizeLimit = this.httpConfig.fileSizeLimit || '5mb';
-    this.authentication = new RestAuthentication(this.httpConfig.auth);
 
     this.app = express();
+
+    this.authentication = new RestAuthentication(this.httpConfig.auth);
+    if (this.httpConfig.challenge) {
+      this.challengeAuthentication = new ChallengeAuthentication(this.app.locals, this.httpConfig.challenge);
+    }
 
     // Setup logger, body-parser and cookie-parser
     this.app.use(logger.httpLogger(httpConfig.logFormat, httpConfig.logLevel))
@@ -178,6 +185,7 @@ export class Restype {
         }
 
         req.auth = this.authentication;
+        req.challenge = this.challengeAuthentication;
         req.params = req.params || {};
 
         const args: any[] = [];

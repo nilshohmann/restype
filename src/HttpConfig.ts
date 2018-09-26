@@ -1,6 +1,8 @@
 import { Handler } from 'express';
 import { ObjectType } from 'typedi';
 
+import { Credentials } from './authentication/Credentials';
+
 export interface CustomRouteInfo {
 
   route: string;
@@ -16,11 +18,18 @@ export interface AccessControlConfig {
 
 export interface AuthConfig {
 
-  basicAuthentication?: <User>(username: string, password: string) => Promise<User | null>;
+  basicAuthentication?: (username: string, password: string) => Promise<any | null>;
 
   jwtSecret?: string;
   jwtExpirationDuration?: number;
-  jwtAuthentication?: <User>(token: any) => Promise<User | null>;
+  jwtAuthentication?: (token: any) => Promise<any | null>;
+
+}
+
+export interface ChallengeConfig {
+
+  challengeExpirationDuration?: number;
+  credentialsQuery: (username: string) => Promise<Credentials>;
 
 }
 
@@ -35,6 +44,7 @@ export interface HttpConfig {
 
   fileSizeLimit?: string;
   accessControl?: AccessControlConfig;
+  challenge?: ChallengeConfig;
   auth?: AuthConfig;
 
   logFormat: string;
