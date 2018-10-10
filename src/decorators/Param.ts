@@ -1,5 +1,5 @@
-import { logger } from '../Logging';
-import { registerParam } from '../Register';
+import { logger } from '../core/Logging';
+import { registerParam } from '../core/Register';
 
 export function Param(name: string, optional?: boolean): Function {
   optional = !!optional;
@@ -21,11 +21,19 @@ export function Body(optional?: boolean): Function {
   };
 }
 
-export function User(optional?: boolean): Function {
+export function Auth(): Function {
+  return (target: Object, property: string, index: number) => {
+    logger.debug(`Auth ${target.constructor.name}.${property}[${index}]`);
+
+    registerParam(target, property, { type: 'auth', index, name: null, optional: false });
+  };
+}
+
+export function CurrentUser(optional?: boolean): Function {
   optional = !!optional;
 
   return (target: Object, property: string, index: number) => {
-    logger.debug(`User ${target.constructor.name}.${property}[${index}] - ${optional}`);
+    logger.debug(`CurrentUser ${target.constructor.name}.${property}[${index}] - ${optional}`);
 
     registerParam(target, property, { type: 'user', index, name: null, optional });
   };

@@ -5,7 +5,7 @@ import ChaiAsPromised = require('chai-as-promised');
 
 import * as jwt from 'jsonwebtoken';
 import { JWTAuthenticator } from '../../src/authentication/JWTAuthenticator';
-import { HttpReqest } from '../../src/HttpRequest';
+import { HttpReqest } from '../../src/core/HttpRequest';
 
 before(() => {
   chai.should();
@@ -23,7 +23,7 @@ describe('JWTAuthenticator', () => {
 
   it('should return null if no authentication info is invalid', async () => {
     const authenticator = new JWTAuthenticator(() => Promise.resolve({} as any), undefined);
-    const req: HttpReqest = { headers: { Authorization: 'Bearer invalid' } };
+    const req: HttpReqest = { headers: { authorization: 'Bearer invalid' } };
 
     return authenticator.authenticate(req).should.eventually.be.null;
   });
@@ -33,7 +33,7 @@ describe('JWTAuthenticator', () => {
     const authenticator = new JWTAuthenticator(() => Promise.resolve({} as any), jwtSecret);
 
     const jwtToken = jwt.sign({ id: 'TestUser' }, jwtSecret, { expiresIn: 0 });
-    const req: HttpReqest = { headers: { Authorization: `Bearer ${jwtToken}` } };
+    const req: HttpReqest = { headers: { authorization: `Bearer ${jwtToken}` } };
 
     return authenticator.authenticate(req).should.eventually.be.null;
   });
@@ -43,7 +43,7 @@ describe('JWTAuthenticator', () => {
     const authenticator = new JWTAuthenticator(() => Promise.resolve(null), jwtSecret);
 
     const jwtToken = jwt.sign({ id: 'TestUser' }, jwtSecret, { expiresIn: 60 });
-    const req: HttpReqest = { headers: { Authorization: `Bearer ${jwtToken}` } };
+    const req: HttpReqest = { headers: { authorization: `Bearer ${jwtToken}` } };
 
     return authenticator.authenticate(req).should.eventually.be.null;
   });
@@ -54,7 +54,7 @@ describe('JWTAuthenticator', () => {
       Promise.resolve(token.id === 'TestUser' ? { userid: token.id } as any : null), jwtSecret);
 
     const jwtToken = jwt.sign({ id: 'TestUser' }, jwtSecret, { expiresIn: 60 });
-    const req: HttpReqest = { headers: { Authorization: `Bearer ${jwtToken}` } };
+    const req: HttpReqest = { headers: { authorization: `Bearer ${jwtToken}` } };
 
     return authenticator.authenticate(req).should.eventually.not.be.null;
   });

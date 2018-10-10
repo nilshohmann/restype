@@ -1,14 +1,16 @@
 import { AuthenticationType } from '../authentication/RestAuthentication';
 export declare type HttpMethod = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 export interface RouteOptions {
-    method?: HttpMethod;
-    authentication?: AuthenticationType;
     route?: string;
+    authentication?: AuthenticationType;
 }
-export declare function Route(options?: RouteOptions): (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => void;
-export declare function Get(route?: string, authentication?: AuthenticationType): (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => void;
-export declare function Head(route?: string, authentication?: AuthenticationType): (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => void;
-export declare function Post(route?: string, authentication?: AuthenticationType): (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => void;
-export declare function Put(route?: string, authentication?: AuthenticationType): (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => void;
-export declare function Patch(route?: string, authentication?: AuthenticationType): (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => void;
-export declare function Delete(route?: string, authentication?: AuthenticationType): (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => void;
+export interface FullRouteOptions extends RouteOptions {
+    method?: HttpMethod;
+}
+export declare function Route(options?: FullRouteOptions): (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => void;
+export declare function Get(options?: RouteOptions): (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => void;
+export declare function Head(options?: RouteOptions): (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => void;
+export declare function Post(options?: RouteOptions): (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => void;
+export declare function Put(options?: RouteOptions): (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => void;
+export declare function Patch(options?: RouteOptions): (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => void;
+export declare function Delete(options?: RouteOptions): (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => void;

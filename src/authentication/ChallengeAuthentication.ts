@@ -1,7 +1,8 @@
-import * as bcrypt from 'bcryptjs';
+import { createHash, randomBytes } from 'crypto';
 
-import { ChallengeConfig } from '../HttpConfig';
-import { AccessDeniedError } from '../HttpError';
+import { AuthConfig } from '../core/HttpConfig';
+import { AccessDeniedError } from '../core/HttpError';
+import { Credentials } from './Credentials';
 
 export const challengeStorageKey = 'restype_challenge_storage';
 const defaultChallengeExpiration = 30000;
@@ -11,24 +12,30 @@ export interface Challenge {
   validUntil: number;
 }
 
-interface ChallengeViewData {
-  challenge?: string;
-  username?: string;
+export interface ChallengeViewData {
+  /**
+   * Previously generated challenge value
+   */
+  challenge: string;
+
+  /**
+   * Name of the user to be authenticated
+   */
+  username: string;
+
+  /**
+   * Base64 result of the challenge result
+   * sha256(username:challenge:password)
+   */
   hash?: string;
 }
 
 export class ChallengeAuthentication {
 
-  private storage: { [id: string]: Challenge; };
+  private storage: { [id: string]: Challenge } = {};
 
-  constructor(locals: any, private config: ChallengeConfig) {
+  constructor(private config: AuthConfig) {
     this.config.challengeExpirationDuration = +this.config.challengeExpirationDuration || defaultChallengeExpiration;
-
-    if (!locals[challengeStorageKey]) {
-      locals[challengeStorageKey] = {};
-    }
-
-    this.storage = locals[challengeStorageKey];
   }
 
   private validateEntries = (): void => {
@@ -40,19 +47,18 @@ export class ChallengeAuthentication {
     }
   }
 
-  create = async (challengeExpiration?: number): Promise<string> => {
+  create = async (challengeExpiration?: number): Promise<Challenge> => {
     challengeExpiration = +challengeExpiration || this.config.challengeExpirationDuration;
 
-    const random = (await bcrypt.genSalt()).substr(-21) + (await bcrypt.genSalt()).substr(-21);
+    const random = randomBytes(30).toString('base64');
     const validUntil = Date.now() + challengeExpiration;
-
     const challenge: Challenge = { random, validUntil };
 
     this.storage[random] = challenge;
-    return random;
+    return challenge;
   }
 
-  verify = async (viewData: ChallengeViewData): Promise<true> => {
+  verify = async (viewData: ChallengeViewData, credentials: Credentials): Promise<true> => {
     this.validateEntries();
 
     const challenge = this.storage[viewData.challenge];
@@ -60,16 +66,16 @@ export class ChallengeAuthentication {
       throw new AccessDeniedError();
     }
 
-    const credentials = await this.config.credentialsQuery(viewData.username);
-    if (!credentials) {
-      throw new AccessDeniedError();
-    }
-
-    const valid = await bcrypt.compare(`${viewData.username}:${viewData.challenge}:${credentials.password}`, viewData.hash);
-    if (!valid) {
+    if (!this.validate(viewData.hash, `${viewData.username}:${viewData.challenge}:${credentials.password}`)) {
       throw new AccessDeniedError();
     }
     return true;
+  }
+
+  private validate = (challengeHash: string, data: string): boolean => {
+    const hash = createHash('sha256');
+    hash.update(data);
+    return challengeHash === hash.digest('base64');
   }
 
 }

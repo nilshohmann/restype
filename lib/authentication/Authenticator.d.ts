@@ -1,4 +1,4 @@
-import { HttpReqest } from '../HttpRequest';
+import { HttpReqest } from '../core/HttpRequest';
 export interface Authenticator {
     authenticate: <User>(req: HttpReqest) => Promise<User | null>;
 }

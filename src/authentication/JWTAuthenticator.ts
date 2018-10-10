@@ -1,6 +1,6 @@
 import * as jwt from 'jsonwebtoken';
 
-import { HttpReqest } from '../HttpRequest';
+import { HttpReqest } from '../core/HttpRequest';
 import { Authenticator, getAuthenticationHeader } from './Authenticator';
 
 export class JWTAuthenticator implements Authenticator {

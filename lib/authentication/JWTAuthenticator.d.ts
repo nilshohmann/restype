@@ -1,4 +1,4 @@
-import { HttpReqest } from '../HttpRequest';
+import { HttpReqest } from '../core/HttpRequest';
 import { Authenticator } from './Authenticator';
 export declare class JWTAuthenticator implements Authenticator {
     private validator;

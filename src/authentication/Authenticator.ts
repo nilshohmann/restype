@@ -1,4 +1,4 @@
-import { HttpReqest } from '../HttpRequest';
+import { HttpReqest } from '../core/HttpRequest';
 
 export interface Authenticator {
 
@@ -7,7 +7,7 @@ export interface Authenticator {
 }
 
 export function getAuthenticationHeader(req: HttpReqest): { type: string, value: string } {
-  const header = getHeader('Authorization', req);
+  const header = getHeader('authorization', req);
   if (!header) {
     return null;
   }

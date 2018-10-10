@@ -1,13 +1,24 @@
 import { AuthenticationType } from '../authentication/RestAuthentication';
-import { logger } from '../Logging';
-import { registerRoute } from '../Register';
+import { logger } from '../core/Logging';
+import { registerRoute } from '../core/Register';
 
 export declare type HttpMethod = 'GET' | 'HEAD' | 'POST' | 'PUT' | 'PATCH' | 'DELETE';
 
 export interface RouteOptions {
-  method?: HttpMethod;
-  authentication?: AuthenticationType;
   route?: string;
+  authentication?: AuthenticationType;
+}
+
+export interface FullRouteOptions extends RouteOptions {
+  method?: HttpMethod;
+}
+
+function extendOptions(options: RouteOptions, fullOptions: FullRouteOptions): FullRouteOptions {
+  return {
+    method: fullOptions.method,
+    route: options.route || fullOptions.route,
+    authentication: options.authentication || fullOptions.authentication,
+  };
 }
 
 function methodFor(property: string): HttpMethod {
@@ -27,7 +38,7 @@ function routeFor(property: string): string {
   }
 }
 
-function prepareOptions(options: RouteOptions, property: string): RouteOptions {
+function prepareOptions(options: FullRouteOptions, property: string): RouteOptions {
   options.method = options.method || methodFor(property);
   options.route = options.route || routeFor(property);
   options.route = options.route.substring(0, 1) === '/' ? options.route : '/' + options.route;
@@ -35,7 +46,7 @@ function prepareOptions(options: RouteOptions, property: string): RouteOptions {
   return options;
 }
 
-export function Route(options?: RouteOptions) {
+export function Route(options?: FullRouteOptions) {
 
   return (target: Object, property: string, descriptor: TypedPropertyDescriptor<(...args: any[]) => Promise<any>>) => {
     options = prepareOptions(options || {}, property);
@@ -46,32 +57,26 @@ export function Route(options?: RouteOptions) {
 
 }
 
-export function Get(route?: string, authentication?: AuthenticationType) {
-  const options: RouteOptions = { method: 'GET', authentication, route };
-  return Route(options);
+export function Get(options?: RouteOptions) {
+  return Route(extendOptions(options || {}, { method: 'GET' }));
 }
 
-export function Head(route?: string, authentication?: AuthenticationType) {
-  const options: RouteOptions = { method: 'HEAD', authentication, route };
-  return Route(options);
+export function Head(options?: RouteOptions) {
+  return Route(extendOptions(options || {}, { method: 'HEAD' }));
 }
 
-export function Post(route?: string, authentication?: AuthenticationType) {
-  const options: RouteOptions = { method: 'POST', authentication, route };
-  return Route(options);
+export function Post(options?: RouteOptions) {
+  return Route(extendOptions(options || {}, { method: 'POST' }));
 }
 
-export function Put(route?: string, authentication?: AuthenticationType) {
-  const options: RouteOptions = { method: 'PUT', authentication, route };
-  return Route(options);
+export function Put(options?: RouteOptions) {
+  return Route(extendOptions(options || {}, { method: 'PUT' }));
 }
 
-export function Patch(route?: string, authentication?: AuthenticationType) {
-  const options: RouteOptions = { method: 'PATCH', authentication, route };
-  return Route(options);
+export function Patch(options?: RouteOptions) {
+  return Route(extendOptions(options || {}, { method: 'PATCH' }));
 }
 
-export function Delete(route?: string, authentication?: AuthenticationType) {
-  const options: RouteOptions = { method: 'DELETE', authentication, route };
-  return Route(options);
+export function Delete(options?: RouteOptions) {
+  return Route(extendOptions(options || {}, { method: 'DELETE' }));
 }

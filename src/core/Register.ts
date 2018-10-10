@@ -1,12 +1,12 @@
 import { Container, ContainerInstance, ObjectType, ServiceMetadata } from 'typedi';
 
-import { ControllerOptions } from './decorators/Controller';
-import { RouteOptions } from './decorators/Route';
+import { ControllerOptions } from '../decorators/Controller';
+import { FullRouteOptions } from '../decorators/Route';
 
-export interface ParamOptions { type: 'param' | 'body' | 'user' | 'req' | 'res'; index: number; name: string; optional: boolean; }
+export interface ParamOptions { type: 'param' | 'body' | 'auth' | 'user' | 'req' | 'res'; index: number; name: string; optional: boolean; }
 
 export interface ControllerItem { controller: ObjectType<any>; options: ControllerOptions; }
-export interface RouteItem { controllerType: any; property: string; options: RouteOptions; }
+export interface RouteItem { controllerType: any; property: string; options: FullRouteOptions; }
 export interface ParamItem { controllerType: any; property: string; options: ParamOptions; }
 
 const controllerList: ControllerItem[] = [];
@@ -35,7 +35,7 @@ export function registerController(controller: ObjectType<any>, options: Control
   Container.set(serviceFor(controller, options));
 }
 
-export function registerRoute(controllerType: any, property: string, options: RouteOptions) {
+export function registerRoute(controllerType: any, property: string, options: FullRouteOptions) {
   routeList.push({ controllerType, property, options });
 }
 

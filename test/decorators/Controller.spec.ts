@@ -5,23 +5,23 @@ import chai = require('chai');
 import ChaiAsPromised = require('chai-as-promised');
 import { Container } from 'typedi';
 
+import { HttpConfig } from '../../src/core/HttpConfig';
+import { controllerFor } from '../../src/core/Register';
+import { Restype } from '../../src/core/Restype';
 import { Controller } from '../../src/decorators/Controller';
-import { HttpConfig } from '../../src/HttpConfig';
-import { controllerFor } from '../../src/Register';
-import { Restype } from '../../src/Restype';
 
 before(() => {
-    chai.should();
-    chai.use(ChaiAsPromised);
+  chai.should();
+  chai.use(ChaiAsPromised);
 
-    Restype.useLogger({
-      verbose: () => {},
-      log: () => {},
-      info: () => {},
-      debug: () => {},
-      warn: () => {},
-      error: () => {},
-    });
+  Restype.useLogger({
+    verbose: () => {},
+    log: () => {},
+    info: () => {},
+    debug: () => {},
+    warn: () => {},
+    error: () => {},
+  });
 });
 
 const httpConfig: HttpConfig = {
@@ -34,24 +34,22 @@ const httpConfig: HttpConfig = {
 };
 
 describe('Controller', () => {
-
   beforeEach(() => {
     Container.reset();
   });
 
   describe('Registration', () => {
     it('should not find an unregistered controller', () => {
-      class TestController { }
+      class TestController {}
 
       return chai.expect(controllerFor(TestController)).to.be.undefined;
     });
 
     it('should register a controller', () => {
       @Controller()
-      class TestController { }
+      class TestController {}
 
       return chai.expect(controllerFor(TestController)).to.not.be.null;
     });
   });
-
 });

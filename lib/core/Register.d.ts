@@ -1,8 +1,8 @@
 import { ContainerInstance, ObjectType } from 'typedi';
-import { ControllerOptions } from './decorators/Controller';
-import { RouteOptions } from './decorators/Route';
+import { ControllerOptions } from '../decorators/Controller';
+import { FullRouteOptions } from '../decorators/Route';
 export interface ParamOptions {
-    type: 'param' | 'body' | 'user' | 'req' | 'res';
+    type: 'param' | 'body' | 'auth' | 'user' | 'req' | 'res';
     index: number;
     name: string;
     optional: boolean;
@@ -14,7 +14,7 @@ export interface ControllerItem {
 export interface RouteItem {
     controllerType: any;
     property: string;
-    options: RouteOptions;
+    options: FullRouteOptions;
 }
 export interface ParamItem {
     controllerType: any;
@@ -23,7 +23,7 @@ export interface ParamItem {
 }
 export declare function registerForContainer(container: ContainerInstance): void;
 export declare function registerController(controller: ObjectType<any>, options: ControllerOptions): void;
-export declare function registerRoute(controllerType: any, property: string, options: RouteOptions): void;
+export declare function registerRoute(controllerType: any, property: string, options: FullRouteOptions): void;
 export declare function registerParam(controllerType: any, property: string, options: ParamOptions): void;
 export declare function controllerFor(type: ObjectType<any> | any): ControllerItem;
 export declare function routesFor(type: any): RouteItem[];

@@ -1,8 +1,8 @@
 import { ObjectType } from 'typedi';
-import { logger } from '../Logging';
 
 import { AuthenticationType } from '../authentication/RestAuthentication';
-import { registerController } from '../Register';
+import { logger } from '../core/Logging';
+import { registerController } from '../core/Register';
 
 export interface ControllerOptions {
   route?: string;
