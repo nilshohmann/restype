@@ -8,6 +8,7 @@ export interface AccessControlConfig {
     allowOrigin?: string;
     allowHeaders?: string | string[];
     allowMethods?: string | string[];
+    allowCredentials?: boolean;
 }
 export interface AuthConfig {
     basicAuthentication?: (username: string, password: string) => Promise<any | null>;

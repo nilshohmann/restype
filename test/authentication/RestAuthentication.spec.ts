@@ -17,12 +17,11 @@ before(() => {
     info: () => {},
     debug: () => {},
     warn: () => {},
-    error: () => {},
+    error: () => {}
   });
 });
 
 describe('RestAuthentication', () => {
-
   it('should return null if authentication type is not available', async () => {
     const authentication = new RestAuthentication({ basicAuthentication: undefined });
     const req: HttpReqest = { headers: { authorization: 'Basic dGVzdDpwYXNzd29yZA==' } };
@@ -44,5 +43,4 @@ describe('RestAuthentication', () => {
 
     return authentication.authenticate('basic', req).should.eventually.be.equal(user);
   });
-
 });

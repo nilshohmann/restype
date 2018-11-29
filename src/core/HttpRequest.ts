@@ -1,8 +1,7 @@
 import { IncomingHttpHeaders } from 'http';
 
-export interface HttpReqest {
-
+export interface HttpReqest {
+  cookies?: { [key: string]: any };
   headers?: IncomingHttpHeaders;
   body?: any;
-
 }

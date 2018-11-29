@@ -1,23 +1,19 @@
 import { Handler } from 'express';
 import { ObjectType } from 'typedi';
 
-import { Credentials } from '../authentication/Credentials';
-
 export interface CustomRouteInfo {
-
   route: string;
   handler: Handler;
-
 }
 
 export interface AccessControlConfig {
   allowOrigin?: string;
   allowHeaders?: string | string[];
   allowMethods?: string | string[];
+  allowCredentials?: boolean;
 }
 
 export interface AuthConfig {
-
   basicAuthentication?: (username: string, password: string) => Promise<any | null>;
 
   jwtSecret?: string;
@@ -25,11 +21,9 @@ export interface AuthConfig {
   jwtAuthentication?: (token: any) => Promise<any | null>;
 
   challengeExpirationDuration?: number;
-
 }
 
 export interface HttpConfig {
-
   host?: string;
   port: number;
   apiPath: string;
@@ -44,5 +38,4 @@ export interface HttpConfig {
 
   logFormat?: string;
   logLevel: string;
-
 }

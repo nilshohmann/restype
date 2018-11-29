@@ -31,21 +31,20 @@ export interface ChallengeViewData {
 }
 
 export class ChallengeAuthentication {
-
   private storage: { [id: string]: Challenge } = {};
 
   constructor(private config: AuthConfig) {
-    this.config.challengeExpirationDuration = +this.config.challengeExpirationDuration || defaultChallengeExpiration;
+    this.config.challengeExpirationDuration = +this.config.challengeExpirationDuration || defaultChallengeExpiration;
   }
 
   private validateEntries = (): void => {
     for (const key in this.storage) {
       const challenge = this.storage[key];
-      if (!challenge || challenge.validUntil < Date.now()) {
+      if (!challenge || challenge.validUntil < Date.now()) {
         delete this.storage[key];
       }
     }
-  }
+  };
 
   create = async (challengeExpiration?: number): Promise<Challenge> => {
     challengeExpiration = +challengeExpiration || this.config.challengeExpirationDuration;
@@ -56,13 +55,13 @@ export class ChallengeAuthentication {
 
     this.storage[random] = challenge;
     return challenge;
-  }
+  };
 
   verify = async (viewData: ChallengeViewData, credentials: Credentials): Promise<true> => {
     this.validateEntries();
 
     const challenge = this.storage[viewData.challenge];
-    if (!challenge) {
+    if (!challenge) {
       throw new AccessDeniedError();
     }
 
@@ -70,12 +69,11 @@ export class ChallengeAuthentication {
       throw new AccessDeniedError();
     }
     return true;
-  }
+  };
 
   private validate = (challengeHash: string, data: string): boolean => {
     const hash = createHash('sha256');
     hash.update(data);
     return challengeHash === hash.digest('base64');
-  }
-
+  };
 }

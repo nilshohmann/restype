@@ -2,18 +2,15 @@ import { NextFunction, Request, Response } from 'express';
 import * as onFinished from 'on-finished';
 
 export interface LoggerType {
-
   log(level: string, msg: string, ...meta: any[]): any;
   debug(msg: string, ...meta: any[]): any;
   verbose(msg: string, ...meta: any[]): any;
   info(msg: string, ...meta: any[]): any;
   warn(msg: string, ...meta: any[]): any;
   error(msg: string, error: Error, ...meta: any[]): any;
-
 }
 
 class ConsoleLogger implements LoggerType {
-
   public log(level: string, msg: string, ...meta: any[]): any {
     console.log.call(this, msg, ...meta);
   }
@@ -36,11 +33,9 @@ class ConsoleLogger implements LoggerType {
   public error(msg: string, error: Error, ...meta: any[]): any {
     console.error.call(this, msg, error, ...meta);
   }
-
 }
 
 export class Logger implements LoggerType {
-
   private logger: LoggerType = new ConsoleLogger();
 
   public setLogger(newLogger: LoggerType) {
@@ -78,14 +73,16 @@ export class Logger implements LoggerType {
       body: (req, res) => req.body as string,
       ip: (req, res) => req.connection.remoteAddress,
       status: (req, res) => String(res.statusCode),
-      responseTime: (req, res) => (req as any).__startTime ? String(Date.now() - (req as any).__startTime) : '-',
-      contentLength: (req, res) => res.getHeader('content-length') as string || '-',
-      userAgent: (req, res) => req.header('user-agent'),
+      responseTime: (req, res) => ((req as any).__startTime ? String(Date.now() - (req as any).__startTime) : '-'),
+      contentLength: (req, res) => (res.getHeader('content-length') as string) || '-',
+      userAgent: (req, res) => req.header('user-agent')
     };
 
-    const formatMsg = eval('(req, res) => `' +
-      format.replace(/{{([^}]+)}}/g, (_, key) => params[key] ? '${params[\'' + key + '\'](req, res)}' : '-') +
-      '`');
+    const formatMsg = eval(
+      '(req, res) => `' +
+        format.replace(/{{([^}]+)}}/g, (_, key) => (params[key] ? '${params["' + key + '"](req, res)}' : '-')) +
+        '`'
+    );
 
     return (req: Request, res: Response, next: NextFunction) => {
       (req as any).__startTime = Date.now();
@@ -97,8 +94,7 @@ export class Logger implements LoggerType {
 
       next();
     };
-  }
-
+  };
 }
 
 export const logger = new Logger();

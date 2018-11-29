@@ -20,7 +20,7 @@ before(() => {
     info: () => {},
     debug: () => {},
     warn: () => {},
-    error: () => {},
+    error: () => {}
   });
 });
 
@@ -30,7 +30,7 @@ const httpConfig: HttpConfig = {
   apiPath: '/api',
   publicPath: '/',
   logFormat: '',
-  logLevel: 'error',
+  logLevel: 'error'
 };
 
 describe('Controller', () => {

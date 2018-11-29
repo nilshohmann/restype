@@ -10,21 +10,20 @@ import { JWTAuthenticator } from './JWTAuthenticator';
 export type AuthenticationType = 'basic' | 'jwt';
 
 export class RestAuthentication {
-
   public readonly challenge: ChallengeAuthentication;
 
   private config: AuthConfig;
-  private readonly authenticators: { [type: string]: Authenticator } = { };
+  private readonly authenticators: { [type: string]: Authenticator } = {};
 
   constructor(config: AuthConfig) {
-    this.config = config || {};
+    this.config = config || {};
     this.challenge = new ChallengeAuthentication(config);
 
-    if (typeof(this.config.basicAuthentication) === 'function') {
+    if (typeof this.config.basicAuthentication === 'function') {
       this.authenticators['basic'] = new BasicAuthenticator(this.config.basicAuthentication);
     }
 
-    if (typeof(this.config.jwtAuthentication) === 'function') {
+    if (typeof this.config.jwtAuthentication === 'function') {
       this.authenticators['jwt'] = new JWTAuthenticator(this.config.jwtAuthentication, this.config.jwtSecret);
     }
   }
@@ -37,10 +36,9 @@ export class RestAuthentication {
     }
 
     return authenticator.authenticate<User>(req);
-  }
+  };
 
   public createJWT = <Payload>(payload: Payload): string => {
     return JWTAuthenticator.createJWT(payload, this.config.jwtSecret);
-  }
-
+  };
 }

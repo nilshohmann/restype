@@ -13,7 +13,6 @@ before(() => {
 });
 
 describe('JWTAuthenticator', () => {
-
   it('should return null if no authentication info is available', async () => {
     const authenticator = new JWTAuthenticator(() => Promise.resolve({} as any), undefined);
     const req: HttpReqest = { headers: {} };
@@ -50,13 +49,14 @@ describe('JWTAuthenticator', () => {
 
   it('should return user if authentication info matches', async () => {
     const jwtSecret = 'TestSecret';
-    const authenticator = new JWTAuthenticator((token: any) =>
-      Promise.resolve(token.id === 'TestUser' ? { userid: token.id } as any : null), jwtSecret);
+    const authenticator = new JWTAuthenticator(
+      (token: any) => Promise.resolve(token.id === 'TestUser' ? ({ userid: token.id } as any) : null),
+      jwtSecret
+    );
 
     const jwtToken = jwt.sign({ id: 'TestUser' }, jwtSecret, { expiresIn: 60 });
     const req: HttpReqest = { headers: { authorization: `Bearer ${jwtToken}` } };
 
     return authenticator.authenticate(req).should.eventually.not.be.null;
   });
-
 });

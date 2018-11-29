@@ -15,9 +15,7 @@ before(() => {
 });
 
 describe('ChallengeAuthentication', () => {
-
   describe('create', () => {
-
     it('should return a new challenge', async () => {
       const challengeAuthentication = new ChallengeAuthentication({});
 
@@ -35,11 +33,9 @@ describe('ChallengeAuthentication', () => {
       const storage = (challengeAuthentication as any).storage;
       return expect(Object.keys(storage)).to.have.lengthOf(2);
     });
-
   });
 
   describe('verify', () => {
-
     it('should throw error if challenge does not exist', async () => {
       const credentials: Credentials = { username: 'TestUser', password: 'password' };
       const challengeAuthentication = new ChallengeAuthentication({});
@@ -82,9 +78,7 @@ describe('ChallengeAuthentication', () => {
       const viewData = { challenge: challenge.random, hash, username: 'TestUser' };
       return challengeAuthentication.verify(viewData, credentials).should.eventually.be.true;
     });
-
   });
-
 });
 
 function sha256(data: string): string {

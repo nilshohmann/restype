@@ -1,14 +1,14 @@
-import { Request, Response, Router } from 'express';
+import { IRouterMatcher, Request, Response, Router } from 'express';
 import Container, { ContainerInstance } from 'typedi';
 
 import { RestAuthentication } from '../authentication/RestAuthentication';
+import { HttpMethod } from '../decorators/Route';
 import { HttpError, InvalidParamsError } from './HttpError';
 import { logger } from './Logging';
 import { ControllerItem, paramsFor, RouteItem } from './Register';
 
 export class RouterBuilder {
-
-  public constructor(private container: ContainerInstance, private authentication: RestAuthentication) { }
+  public constructor(private container: ContainerInstance, private authentication: RestAuthentication) {}
 
   public build = (controllerItem: ControllerItem, routes: RouteItem[]): Router => {
     const router = Router();
@@ -17,24 +17,40 @@ export class RouterBuilder {
       const routeFunc = this.routeForMethod(controllerItem, routeItem);
       const route = controllerItem.options.route + routeItem.options.route;
 
-      switch (routeItem.options.method) {
-        case 'GET': router.get(route, routeFunc); break;
-        case 'HEAD': router.head(route, routeFunc); break;
-        case 'POST': router.post(route, routeFunc); break;
-        case 'PUT': router.put(route, routeFunc); break;
-        case 'PATCH': router.patch(route, routeFunc); break;
-        case 'DELETE': router.delete(route, routeFunc); break;
-        default: logger.warn(`Unknown method for route ${route}: ${routeItem.options.method}`);
+      const routeMatcher = this.routeMatcherFor(routeItem.options.method, router);
+      if (!routeMatcher) {
+        logger.warn(`Unknown method for route ${route}: ${routeItem.options.method}`);
+      } else {
+        routeMatcher(route, routeFunc);
       }
     });
 
     return router;
+  };
+
+  private routeMatcherFor(method: HttpMethod, router: Router): IRouterMatcher<Router> {
+    switch (method) {
+      case 'GET':
+        return router.get;
+      case 'HEAD':
+        return router.head;
+      case 'POST':
+        return router.post;
+      case 'PUT':
+        return router.put;
+      case 'PATCH':
+        return router.patch;
+      case 'DELETE':
+        return router.delete;
+      default:
+        return null;
+    }
   }
 
   private routeForMethod = (controllerItem: ControllerItem, routeItem: RouteItem): ((req: Request, res: Response) => void) => {
     const params = paramsFor(controllerItem.controller, routeItem.property);
 
-    const authentication = routeItem.options.authentication || controllerItem.options.authentication;
+    const authentication = routeItem.options.authentication || controllerItem.options.authentication;
 
     return async (req: Request, res: Response) => {
       try {
@@ -46,20 +62,23 @@ export class RouterBuilder {
           }
         }
 
-        req.params = req.params || {};
+        req.params = req.params || {};
 
         const args: any[] = [];
         params.forEach((param) => {
           args[param.options.index] = ((type: string) => {
             switch (type) {
-              case 'req': return req;
-              case 'res': return res;
-              case 'auth': return this.authentication;
+              case 'req':
+                return req;
+              case 'res':
+                return res;
+              case 'auth':
+                return this.authentication;
               case 'user':
-              if (!param.options.optional && !user) {
-                throw new InvalidParamsError('Missing user');
-              }
-              return user;
+                if (!param.options.optional && !user) {
+                  throw new InvalidParamsError('Missing user');
+                }
+                return user;
               case 'body':
                 if (!param.options.optional && !req.body) {
                   throw new InvalidParamsError('Missing body');
@@ -75,7 +94,9 @@ export class RouterBuilder {
           })(param.options.type);
         });
 
-        const instance = this.container ? this.container.get(controllerItem.controller) : Container.get(controllerItem.controller);
+        const instance = this.container
+          ? this.container.get(controllerItem.controller)
+          : Container.get(controllerItem.controller);
         const method: (...args: any[]) => Promise<any> = instance[routeItem.property].bind(instance);
 
         const result = await method(...args);
@@ -86,12 +107,12 @@ export class RouterBuilder {
         }
       } catch (error) {
         if (error instanceof HttpError) {
-          res.status(error.status).json({ error: error.message  });
+          res.status(error.status).json({ error: error.message });
         } else {
           logger.error('Request error:', error.stack);
           res.status(500).json({ error: 'An internal error occured' });
         }
       }
     };
-  }
+  };
 }

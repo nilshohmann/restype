@@ -1,12 +1,10 @@
 import { HttpReqest } from '../core/HttpRequest';
 
 export interface Authenticator {
-
   authenticate: <User>(req: HttpReqest) => Promise<User | null>;
-
 }
 
-export function getAuthenticationHeader(req: HttpReqest): { type: string, value: string } {
+export function getAuthenticationHeader(req: HttpReqest): { type: string; value: string } {
   const header = getHeader('authorization', req);
   if (!header) {
     return null;

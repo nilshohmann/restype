@@ -7,5 +7,6 @@ export declare class RouterBuilder {
     private authentication;
     constructor(container: ContainerInstance, authentication: RestAuthentication);
     build: (controllerItem: ControllerItem, routes: RouteItem[]) => Router;
+    private routeMatcherFor;
     private routeForMethod;
 }

@@ -1,9 +1,9 @@
 {
   "compilerOptions": {
     "target": "es6",
-    "lib": [ "es6" ],
-    "types": [ "node", "reflect-metadata" ],
-    "typeRoots": [ "node_modules/@types" ],
+    "lib": ["es6"],
+    "types": ["node", "reflect-metadata"],
+    "typeRoots": ["node_modules/@types"],
     "module": "commonjs",
     "moduleResolution": "node",
     "experimentalDecorators": true,
@@ -12,6 +12,6 @@
     "sourceMap": false,
     "removeComments": true,
     "declaration": true,
-    "outDir": "lib",
+    "outDir": "lib"
   }
 }

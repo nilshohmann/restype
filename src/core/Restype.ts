@@ -16,7 +16,6 @@ import { RouterBuilder } from './RouterBuilder';
  * Basic web server setup.
  */
 export class Restype {
-
   private server: Server;
   private authentication: RestAuthentication;
 
@@ -34,7 +33,8 @@ export class Restype {
     this.app = this.app || express();
 
     // Setup logger, body-parser and cookie-parser
-    this.app.use(logger.httpLogger(this.config.logFormat, this.config.logLevel))
+    this.app
+      .use(logger.httpLogger(this.config.logFormat, this.config.logLevel))
       .use(bodyParser.json({ limit: this.config.fileSizeLimit }))
       .use(bodyParser.urlencoded({ extended: true, limit: this.config.fileSizeLimit }))
       .use(cookieParser())
@@ -45,7 +45,7 @@ export class Restype {
     this.authentication = new RestAuthentication(this.config.auth);
 
     // Setup container, use global container by default
-    this.container = this.container || Container.of(undefined);
+    this.container = this.container || Container.of(undefined);
     if (this.container) {
       registerForContainer(this.container);
     }
@@ -74,19 +74,19 @@ export class Restype {
   }
 
   private prepareConfig(config: HttpConfig): HttpConfig {
-    config.host = config.host || 'localhost';
-    config.port = config.port || 80;
-    config.apiPath = config.apiPath || '/api';
-    config.publicPath = config.publicPath || '/public';
+    config.host = config.host || 'localhost';
+    config.port = config.port || 80;
+    config.apiPath = config.apiPath || '/api';
+    config.publicPath = config.publicPath || '/public';
 
-    config.controllers = config.controllers || [];
-    config.customRoutes = config.customRoutes || [];
+    config.controllers = config.controllers || [];
+    config.customRoutes = config.customRoutes || [];
 
     config.fileSizeLimit = config.fileSizeLimit || '5mb';
-    config.accessControl = config.accessControl || {};
-    config.auth = config.auth || {};
+    config.accessControl = config.accessControl || {};
+    config.auth = config.auth || {};
 
-    config.logFormat = config.logFormat || '{{method}} {{url}} -> {{status}}, {{responseTime}} ms, {{contentLength}} byte';
+    config.logFormat = config.logFormat || '{{method}} {{url}} -> {{status}}, {{responseTime}} ms, {{contentLength}} byte';
     config.logLevel = config.logLevel || 'warn';
 
     return config;
@@ -94,18 +94,19 @@ export class Restype {
 
   private prepareAccessControl = (): void => {
     const config = this.config.accessControl;
-    const allowOrigin = config.allowOrigin || '';
-    const allowHeaders = Array.isArray(config.allowHeaders) ? config.allowHeaders.join(',') : config.allowHeaders || '*';
-    const allowMethods = Array.isArray(config.allowMethods) ? config.allowMethods.join(',') : config.allowMethods || '*';
+    const allowOrigin = config.allowOrigin || '';
+    const allowHeaders = Array.isArray(config.allowHeaders) ? config.allowHeaders.join(',') : config.allowHeaders || '*';
+    const allowMethods = Array.isArray(config.allowMethods) ? config.allowMethods.join(',') : config.allowMethods || '*';
 
     this.app.use((req, res, next) => {
       res.header('Access-Control-Allow-Origin', allowOrigin);
       res.header('Access-Control-Allow-Headers', allowHeaders);
       res.header('Access-Control-Allow-Methods', allowMethods);
+      res.header('Access-Control-Allow-Credentials', '' + !!config.allowCredentials);
 
       next();
     });
-  }
+  };
 
   public start = (): Promise<Server> => {
     return new Promise((resolve, reject) => {
@@ -135,7 +136,7 @@ export class Restype {
 
       this.server.listen(this.config.port, this.config.host);
     });
-  }
+  };
 
   private registerControllers = () => {
     const routerBuilder = new RouterBuilder(this.container, this.authentication);
@@ -156,6 +157,5 @@ export class Restype {
       logger.verbose('Registering controller:', controllerInfo.controller.prototype.constructor.name);
       this.app.use(this.config.apiPath, routerBuilder.build(controllerInfo, routes));
     });
-  }
-
+  };
 }

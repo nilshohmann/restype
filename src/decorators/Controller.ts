@@ -13,10 +13,9 @@ export interface ControllerOptions {
 }
 
 export function Controller(options?: ControllerOptions) {
-
   return (target: ObjectType<any>) => {
-    options = options || {};
-    options.global = options.global || false;
+    options = options || {};
+    options.global = options.global || false;
 
     const controllerName: string = target.prototype.constructor.name;
     options.route = options.route || '/' + controllerName.toLowerCase().replace(/controller$/, '');
@@ -25,5 +24,4 @@ export function Controller(options?: ControllerOptions) {
 
     registerController(target, options);
   };
-
 }

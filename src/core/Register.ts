@@ -3,11 +3,29 @@ import { Container, ContainerInstance, ObjectType, ServiceMetadata } from 'typed
 import { ControllerOptions } from '../decorators/Controller';
 import { FullRouteOptions } from '../decorators/Route';
 
-export interface ParamOptions { type: 'param' | 'body' | 'auth' | 'user' | 'req' | 'res'; index: number; name: string; optional: boolean; }
+export interface ParamOptions {
+  type: 'param' | 'body' | 'auth' | 'user' | 'req' | 'res';
+  index: number;
+  name: string;
+  optional: boolean;
+}
 
-export interface ControllerItem { controller: ObjectType<any>; options: ControllerOptions; }
-export interface RouteItem { controllerType: any; property: string; options: FullRouteOptions; }
-export interface ParamItem { controllerType: any; property: string; options: ParamOptions; }
+export interface ControllerItem {
+  controller: ObjectType<any>;
+  options: ControllerOptions;
+}
+
+export interface RouteItem {
+  controllerType: any;
+  property: string;
+  options: FullRouteOptions;
+}
+
+export interface ParamItem {
+  controllerType: any;
+  property: string;
+  options: ParamOptions;
+}
 
 const controllerList: ControllerItem[] = [];
 const routeList: RouteItem[] = [];
@@ -18,8 +36,8 @@ function serviceFor<T, K extends keyof T>(type: ObjectType<any>, options: Contro
     type,
     id: options.id,
     multiple: false,
-    global: options.global || false,
-    transient: options.transient === false ? false : true,
+    global: options.global || false,
+    transient: options.transient === false ? false : true
   };
 }
 
