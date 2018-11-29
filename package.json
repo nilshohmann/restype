@@ -16,28 +16,28 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "cookie-parser": "^1.4.3",
-    "express": "^4.16.3",
-    "jsonwebtoken": "^8.3.0",
+    "express": "^4.16.4",
+    "jsonwebtoken": "^8.4.0",
     "on-finished": "^2.3.0",
     "typedi": "^0.8.0"
   },
   "devDependencies": {
     "@types/body-parser": "^1.17.0",
-    "@types/chai": "^4.1.5",
+    "@types/chai": "^4.1.7",
     "@types/chai-as-promised": "^7.1.0",
     "@types/cookie-parser": "^1.4.1",
     "@types/express": "^4.16.0",
-    "@types/jsonwebtoken": "^7.2.8",
+    "@types/jsonwebtoken": "^8.3.0",
     "@types/mocha": "^5.2.5",
-    "@types/node": "^9.6.32",
+    "@types/node": "^10.12.10",
     "@types/on-finished": "^2.3.1",
-    "chai": "^4.1.2",
+    "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "jasmine-ts": "^0.2.1",
+    "jasmine-ts": "^0.3.0",
     "mocha": "^5.2.0",
     "reflect-metadata": "^0.1.12",
     "ts-node": "^7.0.1",
     "tslint": "^5.11.0",
-    "typescript": "^2.9.2"
+    "typescript": "^3.1.6"
   }
 }
