@@ -33,7 +33,6 @@
     "@types/on-finished": "^2.3.1",
     "chai": "^4.2.0",
     "chai-as-promised": "^7.1.1",
-    "jasmine-ts": "^0.3.0",
     "mocha": "^6.2.0",
     "reflect-metadata": "^0.1.13",
     "ts-node": "^8.3.0",
